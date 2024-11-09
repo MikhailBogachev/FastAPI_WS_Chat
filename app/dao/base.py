@@ -8,7 +8,7 @@ class BaseDAO:
     model = None
 
     @classmethod
-    async def find_on_or_noe_by_id(cls, data_id: int):
+    async def find_on_or_none_by_id(cls, data_id: int):
         """
         Асинхронно находит и возвращает один экземпляр модели по указанным критериям или None.
 
