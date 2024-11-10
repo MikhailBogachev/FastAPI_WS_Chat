@@ -5,7 +5,7 @@ from jose import jwt
 from pydantic import EmailStr
 
 from app.config import TOKEN_EXPIRATION_PERIOD, get_auth_data
-from app.users.dao import UsersDAO
+from app.users.dao import UserDAO
 
 
 def create_access_token(data: dict) -> str:
@@ -29,7 +29,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def authenticate_user(email: EmailStr, password: str):
-    user = await UsersDAO.find_one_or_none(email=email)
+    user = await UserDAO.find_one_or_none(email=email)
     if not user or not verify_password(
         plain_password=password, hashed_password=user.hashed_password
     ):
