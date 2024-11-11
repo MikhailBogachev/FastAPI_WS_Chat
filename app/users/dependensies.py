@@ -4,6 +4,7 @@ from jose import jwt, JWTError
 
 from app.config import get_auth_data
 from app.exceptions import TokenExpiredException, TokenNoFoundException, NoJwtException, NoUserIdException
+from app.users.dao import UserDAO
 
 
 def get_token(request: Request):
@@ -29,7 +30,7 @@ async def get_current_user(token: str = Depends(get_token)):
     if not user_id:
         raise NoUserIdException
 
-    user: str = payload.get('sub')
+    user: str = await UserDAO.find_on_or_none_by_id(int(user_id))
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
     return user

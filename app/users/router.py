@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Request, Response
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 from app.users.auth import authenticate_user, create_access_token, get_password_hash
 from app.users.schemas import UserAuthSchema, UserRegisterSchema
@@ -6,6 +8,7 @@ from app.users.dao import UserDAO
 from app.exceptions import UserAlreadyExistsException, PasswordMismatchException, IncorrectEmailOrPasswordException
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
+templates = Jinja2Templates(directory='app/templates')
 
 
 @router.post('/register/')
@@ -32,7 +35,7 @@ async def auth_user(response: Response, user_data: UserAuthSchema):
     if not user:
         raise IncorrectEmailOrPasswordException
     access_token = create_access_token({'sub': user.id})
-    response.set_cookie(key='user_access_token', value=access_token, htpponly=True)
+    response.set_cookie(key='user_access_token', value=access_token, httponly=True)
     return {'ok': True, 'access_token': access_token, 'refresh_token': None, 'message': 'Авторизация успешна!'}
 
 
@@ -40,3 +43,8 @@ async def auth_user(response: Response, user_data: UserAuthSchema):
 async def logout_user(response: Response):
     response.delete_cookie(key='users_access_token')
     return {'message': 'Пользователь успешно вышел из системы'}
+
+
+@router.get('/', response_class=HTMLResponse, summary='Страница авторизации')
+async def get_categories(request: Request):
+    return templates.TemplateResponse('auth.html', {"request": request})
