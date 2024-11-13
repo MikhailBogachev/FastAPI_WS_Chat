@@ -34,8 +34,8 @@ async def auth_user(response: Response, user_data: UserAuthSchema):
     user = await authenticate_user(email=user_data.email, password=user_data.password)
     if not user:
         raise IncorrectEmailOrPasswordException
-    access_token = create_access_token({'sub': user.id})
-    response.set_cookie(key='user_access_token', value=access_token, httponly=True)
+    access_token = create_access_token({'sub': str(user.id)})
+    response.set_cookie(key='users_access_token', value=access_token, httponly=True)
     return {'ok': True, 'access_token': access_token, 'refresh_token': None, 'message': 'Авторизация успешна!'}
 
 
