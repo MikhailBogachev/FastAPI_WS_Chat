@@ -54,11 +54,20 @@ async def webscoket_endpoint(websocket: WebSocket, user_id: int):
 
 @router.post('/messages', response_model=MessageCreate)
 async def send_message(message: MessageCreate, current_user: User = Depends(get_current_user)):
-    # TODO переделать под вебсокет
+
     await MessagesDAO.add(
         sender_id=current_user.id,
         content=message.content,
         recipient_id=message.recipient_id
     )
+
+    message_data = {
+        'sender_id': current_user.id,
+        'recipient_id': message.recipient_id,
+        'content': message.content,
+    }
+
+    await notify_user(message.recipient_id, message_data)
+    await notify_user(current_user.id, message_data)
 
     return {'recepient_id': message.recipient_id, 'content': message.content, 'status': 'ok', 'msg': 'Message saved!'}
