@@ -1,9 +1,10 @@
+from typing import List
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.users.auth import authenticate_user, create_access_token, get_password_hash
-from app.users.schemas import UserAuthSchema, UserRegisterSchema
+from app.users.schemas import UserAuthSchema, UserReadSchema, UserRegisterSchema
 from app.users.dao import UserDAO
 from app.exceptions import UserAlreadyExistsException, PasswordMismatchException, IncorrectEmailOrPasswordException
 
@@ -48,3 +49,9 @@ async def logout_user(response: Response):
 @router.get('/', response_class=HTMLResponse, summary='Страница авторизации')
 async def get_categories(request: Request):
     return templates.TemplateResponse('auth.html', {"request": request})
+
+
+@router.get('/users', response_model=List[UserReadSchema])
+async def get_users():
+    users_all = await UserDAO.find_all()
+    return [{'id': user.id, 'name': user.name} for user in users_all]

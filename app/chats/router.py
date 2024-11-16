@@ -41,7 +41,7 @@ async def notify_user(user_id: int, message: dict):
         await websocket.send_json(message)
 
 
-@router.webscoket('/ws/{user_id}')
+@router.websocket('/ws/{user_id}')
 async def webscoket_endpoint(websocket: WebSocket, user_id: int):
     await websocket.accept()
     active_connections[user_id] = websocket
